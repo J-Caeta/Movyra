@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: movyra_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: super-secure-db-password-change-me
+      POSTGRES_DB: movyra_erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: movyra_backend
+    restart: always
+    environment:
+      PORT: 3001
+      DATABASE_URL: "postgresql://postgres:super-secure-db-password-change-me@postgres:5432/movyra_erp?schema=public"
+      JWT_SECRET: "change-this-in-production-to-something-very-long"
+      JWT_REFRESH_SECRET: "change-this-refresh-in-production-to-something-very-long"
+      EMAIL_HOST: "smtp.gmail.com"
+      EMAIL_PORT: 587
+      EMAIL_USER: "seu-email@gmail.com"
+      EMAIL_PASS: "sua-senha-app"
+      EMAIL_FROM: "gestaomovyra@gmail.com"
+      NODE_ENV: "production"
+      FRONTEND_URL: "http://localhost:8080"
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: movyra_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const martial_art_controller_1 = require("./martial-art.controller");
+const auth_1 = require("../../middlewares/auth");
+const router = (0, express_1.Router)();
+router.use(auth_1.authMiddleware);
+router.get('/progress', martial_art_controller_1.listProgress);
+router.post('/progress/:studentId', martial_art_controller_1.updateProgress);
+router.post('/progress/:studentId/promote', martial_art_controller_1.promoteAthlete);
+exports.default = router;
